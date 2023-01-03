@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="flex justify-center flex-col lg:flex-row gap-5">
+    <div class="w-full md:w-[40%]">
+        <div class="card card-body bg-base-100 rounded-xl shadow">
+            <h1 class="text-xl mb-3 font-bold">Panduan Penggunaan Aplikasi</h1>
+            {% include "components/acc_panduan.html" %}
+        </div>
+    </div>
+    <div class="w-full md:w-[60%]">
+        <div class="card card-body bg-base-100 rounded-xl shadow">
+            <h1 class="text-xl mb-3 font-bold">Panduan Dataset</h1>
+            {% include "components/acc_dataset.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

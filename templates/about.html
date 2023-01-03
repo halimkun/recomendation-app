@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="flex justify-center flex-col lg:flex-row items-center">
+        <div class="w-full lg:w-[50%] py-16 md:py-28">
+            {% load static %}
+            <img src="{% static 'img/undraw_hire_re_gn5j .svg' %}" alt="" class="w-full md:w-[90%]">
+        </div>
+        <div class="w-full lg:w-[50%]">
+            <div class="p-3 md:p-10">
+                <h1 class="text-4xl italic font-bold mb-4">Rekomendation App</h1>
+                <p class="mb-3">
+                    Aplikasi rekomendasi yang memanfaatkan metode klasisifikasi dengan algoritma Decision Tree. 
+                </p>
+                <p class="mb-3">
+                    Recomendation App ini diperuntukan untuk membantu BKK SMK dalam menentukan rekomendasi perusahaan yang sesuai dengan kompetensi siswa-siswinya.
+                </p>
+                <p class="mb-3">
+                    Aplikasi ini memanfaatkan algoritma data mining Decision Tree untuk menentukan rekomendasi, dan aplikasi ini dibuat sebagai project akhir skripsi.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

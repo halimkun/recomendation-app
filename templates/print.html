@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<style>
+    /* media print marin top  */
+    @media print {
+        @page {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        body {
+            padding-top: 3cm;
+        }
+    }
+</style>
+<div class="flex flex-col w-full items-center justify-center">
+    <!-- <div class="w-[21cm] h-[29.7cm] bg-white p-5 px-[1.5cm] shadow parea" id="parea"> -->
+    <div class="text-center">
+        <h1 class="text-2xl font-bold underline">SURAT REKOMENDASI</h1>
+        <p class="text-base"><span class="mr-10">NOMOR :</span> / SKETR / <span id="month"></span> / <span
+                id="year"></span></p>
+    </div>
+    <div class="mt-5">
+        <p>Yang bertanda tangan dibawah ini :</p>
+        <table class="table-compact table-fixed text-left mt-2">
+            <tr>
+                <td class=" text-base border-0 w-[30%]">Nama</td>
+                <td class="border-0">:</td>
+                <td class=" text-base border-0 w-full">Tarto Raharjo, S.T, M.T</td>
+            </tr>
+            <tr>
+                <td class=" text-base border-0 w-[30%]">NIPY</td>
+                <td class="border-0">:</td>
+                <td class=" text-base border-0 w-full">65.274</td>
+            </tr>
+            <tr>
+                <td class=" text-base border-0 w-[30%]">Jabatan</td>
+                <td class="border-0">:</td>
+                <td class=" text-base border-0 w-full">Kepala Sekolah</td>
+            </tr>
+            <tr>
+                <td class=" text-base border-0 w-[30%]">Alamat Sekolah</td>
+                <td class="border-0">:</td>
+                <td class=" text-base border-0 w-full">Rowokembu, Kec. Wonopringgo, Kabupaten Pekalongan, Jawa
+                    Tengah 51181</td>
+            </tr>
+        </table>
+    </div>
+    <div class="mt-5">
+        <p>Dengan ini menerangkan bahwa : </p>
+        <table class="table-compact table-fixed text-left border-collapse border border-gray-400 mt-2">
+            <tr>
+                <th class="bg-gray-100 border border-gray-400">Nama</th>
+                <th class="bg-gray-100 border border-gray-400">Matematika Rapor</th>
+                <th class="bg-gray-100 border border-gray-400">Rata-rata Rapor</th>
+                <th class="bg-gray-100 border border-gray-400">Rata-rata US</th>
+                <th class="bg-gray-100 border border-gray-400">Ujian Praktik Kejuruan</th>
+                <th class="bg-gray-100 border border-gray-400">AVG</th>
+            </tr>
+            <tr>
+                <td class="border border-gray-400">Muhamad Faisal Halim</td>
+                <td class="border border-gray-400">87</td>
+                <td class="border border-gray-400">75</td>
+                <td class="border border-gray-400">59</td>
+                <td class="border border-gray-400">83</td>
+                <td class="border border-gray-400">95.8</td>
+            </tr>
+        </table>
+    </div>
+    <div class="mt-5">
+        <p>
+            Dengan ini merekomendasikan siswa tersebut sebagai kandidat karyawan baru pada <span
+                class="font-bold uppercase">PT. ASTRA HONDA MOTOR (AHM)</span> dikarenakan telah memenuhi kriteria
+            sesuai dengan data sebelumnya, dan telah melalui proses seleksi menggunakan software sistem rekomendasi
+            perusahaan.
+        </p>
+        <p class="mt-3">
+            Demikian surat rekomendasi ini dibuat untuk dapat dipergunakan sebagaimana mestinya.
+        </p>
+    </div>
+    <div class="flex w-full items-center justify-between mt-10">
+        <div class="w-full">
+
+        </div>
+        <div class="w-full text-center">
+            <p>Wonopringgo, <span id="tgl"></span> <span id="bln"></span> <span id="thn"></span></p>
+            <p>Kepala SMK GONDANG</p>
+            <p class="mt-20 font-bold uppercase underline">Tarto Raharjo, S.T, M.T</p>
+            <p class="font-bold uppercase">NIPY : 65.274</p>
+        </div>
+    </div>
+    <!-- </div> -->
+</div>
+
+<script>
+    const month = new Date().getMonth() + 1;
+    const year = new Date().getFullYear();
+    document.getElementById('month').innerHTML = month;
+    document.getElementById('year').innerHTML = year;
+
+    const tgl = new Date().getDate();
+    const bln = new Date().toLocaleString('default', { month: 'long' });
+    const thn = new Date().getFullYear();
+
+    document.getElementById('tgl').innerHTML = tgl;
+    document.getElementById('bln').innerHTML = bln;
+    document.getElementById('thn').innerHTML = thn;
+
+    // onload download pdf parea
+    window.onload = function () {
+        window.print();
+        // html2pdf(document.getElementById('parea'), {
+        //     margin: [5, 2, 2, 2],
+        //     filename: 'surat-rekomendasi-faisal.pdf',
+        //     image: {
+        //         type: 'jpeg',
+        //         quality: 0.98
+        //     },
+        //     html2canvas: {
+        //         scale: 3,
+        //         letterRendering: true,
+        //     },
+        //     jsPDF: {
+        //         unit: 'in',
+        //         format: 'a4',
+        //         orientation: 'portrait'
+        //     }
+        // });
+    }
+</script>
+{% endblock %}
