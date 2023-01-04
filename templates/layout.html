@@ -21,7 +21,7 @@
         {% include "components/nav_menu.html" %}
     {% endif %}
 
-    <div class="px-5 md:px-28 lg:px-20 p-5 min-h-screen bg-base-200">
+    <div class="px-5 md:px-28 lg:px-20 p-5 min-h-screen {% if "print" not in request.path %} bg-base-200 {% endif %}">
         {% block content %} {% endblock %}
     </div>
     

@@ -95,7 +95,22 @@ def print_rekomendasi(request):
     if request.method != 'POST':
         return redirect('/rekomendasi/')
     else:
-        return render(request, 'print.html', {'request': request})
+        # data is key and value from post request
+        key = request.POST.dict()
+        key.pop('csrfmiddlewaretoken')
+        key.pop('prediction')
+
+        # get data from post request
+        data = []
+        for i in key:
+            data.append((key[i].lower()))
+
+        # return JsonResponse(data, safe=False)
+        
+        return render(request, 'print.html', {
+            "key" : key,
+            "data" : data,
+        })
 
 # ==================== DATASET ==================== #
 

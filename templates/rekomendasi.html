@@ -66,10 +66,10 @@
                     aria-selected="false">Dataset</button>
                 <button class="mx-1 tab grow btn-sm btn btn-outline btn-primary" id="rekomendasi-tab"
                     data-tabs-target="#rekomendasi" type="button" role="tab" aria-controls="rekomendasi"
-                    aria-selected="true">Rekomendasi</button>
+                    aria-selected="false">Rekomendasi</button>
                 <button class="mx-1 tab grow btn-sm btn btn-outline btn-primary" id="mass-rekomendasi-tab"
                     data-tabs-target="#mass-rekomendasi" type="button" role="tab" aria-controls="mass-rekomendasi"
-                    aria-selected="false">Mass Rekomendasi</button>
+                    aria-selected="true">Mass Rekomendasi</button>
             </div>
         </div>
         <div id="myTabContent">
@@ -199,8 +199,8 @@
                 </div>
 
                 {% if dataset == True %}
-                <div class="card card-body bg-base-100 shadow rouned-xl mt-5" id="chasil">
-                    <div class="mb-5 flex justify-between items-center">
+                <div class="card card-body bg-base-100 shadow rouned-xl mt-5 hidden" id="chasil">
+                    <div class="mb-5 flex justify-between gap-10 items-center">
                         <div>
                             <h3 class="text-2xl font-semibold leading-1">Hasil Rekomendasi</h3>
                             <p class="text-sm text-gray-500">
@@ -301,12 +301,27 @@
             </div>
 
             <div id="mass-rekomendasi" role="tabpanel" aria-labelledby="mass-rekomendasi-tab">
-                <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong
-                        class="font-medium text-gray-800 dark:text-white">mass-rekomendasi tab's associated
-                        content</strong>.
-                    Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript
-                    swaps
-                    classes to control the content visibility and styling.</p>
+                <div class="card card-body bg-base-100 shadow rouned-xl">
+                    {% if dataset == False %}
+                    <div class="alert alert-error shadow-lg">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6"
+                                fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Data Masih Belum Diupload!</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mb-5">
+                        <h3 class="text-2xl font-semibold leading-1">Mass Rekomendasi</h3>
+                        <p class="text-sm text-gray-500">
+                            Fitur ini digunakan untuk melakukan rekomendasi secara massal dengan memanfaatkan data yang sudah terkumpul pada file <span class="font-bold">excel</span>, atau menggunakan file <span class="font-bold">csv</span>.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
