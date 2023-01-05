@@ -6,7 +6,7 @@ import json
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 
-from .forms import UploadFileForm, handle_uploaded_file
+from .forms import UploadFileForm, handle_upload_dataset, handle_upload_dtest
 
 from sklearn import tree, preprocessing
 from sklearn.model_selection import train_test_split
@@ -37,18 +37,18 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-def rekomendasi(request):
+def init_rekomendasi(req):
     context = {
         'title': 'RECAPP | Rekomendasi',
-        'nav': nav_menu(request),
-        'request': request,
+        'nav': nav_menu(req),
+        'request': req,
         'dataset': False,
     }
 
-    if len(os.listdir('media/')) == 0:
-        context = context
+    if len(os.listdir('media/dset/')) == 0:
+            context = context
     else:
-        df = pd.read_csv('media/' + os.listdir('media/')[-1])
+        df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
 
         last_col = df.iloc[:, -1].value_counts().to_dict()
         last_col = list(last_col.items())
@@ -62,11 +62,16 @@ def rekomendasi(request):
             col_name.append({'key': nilai_df.columns[i].replace(" ", "_").lower() , 'value': nilai_df.columns[i]})
         
         context['dataset'] = True
-        context['filename'] = os.listdir('media/')[-1]
+        context['filename'] = os.listdir('media/dset/')[-1]
         context['input_label'] = col_name
         context['data'] = df
-        
+
+    return context
+
+def rekomendasi(request):  
+    context = init_rekomendasi(req=request)
     return render(request, 'rekomendasi.html', context)
+
 
 
 def bantuan(request):
@@ -104,13 +109,152 @@ def print_rekomendasi(request):
         data = []
         for i in key:
             data.append((key[i].lower()))
-
-        # return JsonResponse(data, safe=False)
         
         return render(request, 'print.html', {
             "key" : key,
             "data" : data,
         })
+
+
+def print_mrekomendasi(request):
+    if request.method != 'POST':
+        return redirect('/rekomendasi/')
+    else:
+        filter_label = request.POST.get('label')
+        # mres file to dataframe
+        df = pd.read_csv('media/mres/' + os.listdir('media/mres/')[-1])
+
+        # filter by label
+        filtered_df = df[df['label'] == filter_label]
+        filtered_df.columns = filtered_df.columns.str.lower()
+
+        # get filtered_df except label and no
+        fix_df = filtered_df.drop(filtered_df.columns[0], axis=1)
+        fix_df = fix_df.drop(filtered_df.columns[-1], axis=1)
+        
+        return render(request, 'mprint.html', {
+            "data" : fix_df,
+            "pred" : filter_label,
+        })
+    
+    
+def mass_recomendation(request):
+    if request.method != 'POST':
+        return redirect('/rekomendasi/')
+    else:
+        if len(os.listdir('media/dtest/')) != 0:
+            for i in os.listdir('media/dtest/'):
+                os.remove('media/dtest/' + i)
+                
+        if len(os.listdir('media/mres/')) != 0:
+            for i in os.listdir('media/mres/'):
+                os.remove('media/mres/' + i)
+            
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_upload_dtest(request.FILES['dataset'])
+
+        res = mass_rec()    # result label
+
+        # merge res with dtest
+        dtest = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
+
+        # get numeric column
+        numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+        numdf = dtest.select_dtypes(include=numerics)
+        numdf = numdf.drop(numdf.columns[0], axis=1)
+        
+        # add average to dtest
+        dtest['avg'] = numdf.mean(axis=1)
+
+        # add label to dtest
+        dtest['label'] = res
+        
+        # short dtest by average high to low
+        dtest = dtest.sort_values(by=['avg'], ascending=False)
+
+        # save dtest to csv in media/mres
+        dtest.to_csv('media/mres/' + os.listdir('media/dtest/')[-1], index=False)
+
+        col = dtest.columns.tolist()
+        lebel = dtest['label'].unique().tolist()
+        data = {}
+        for i in lebel:
+            data[i] = dtest[dtest['label'] == i].to_dict('records')
+            
+        return JsonResponse({
+            'col': col,
+            'data': data,
+        }, safe=False)
+            
+
+        
+def mass_rec() :
+    # load dataset
+    df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
+    
+    # lowercase column name
+    df.columns = df.columns.str.lower()
+
+    # remove outlier
+    Q1 = df.quantile(0.25)
+    Q3 = df.quantile(0.75)
+    IQR = Q3 - Q1
+    df = df[~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+    # drop missing value
+    df = df.dropna()
+
+    # reindex
+    df = df.reset_index(drop=True)
+
+    # get numeric column
+    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    numdf = df.select_dtypes(include=numerics)     
+    numdf = numdf.drop(columns=['no'])     # drop No column cause it's not important but it's numeric
+
+    # get label column
+    label = df.iloc[:, -1]
+
+    # scale data
+    scaler = preprocessing.MinMaxScaler()
+    scaled = scaler.fit_transform(numdf)
+
+    # split data
+    X_train, X_test, y_train, y_test = train_test_split(scaled, label, test_size=0.3, random_state=42)
+    
+    # model init
+    clf = tree.DecisionTreeClassifier(
+        max_depth=3,
+        splitter='best',
+        min_samples_leaf=5,
+        criterion='entropy',
+    )
+
+    # train model
+    clf.fit(scaled, label)
+
+    # get accuracy
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+
+    # load excel data
+    df_test = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
+    
+    # lowercase column name
+    df_test.columns = df_test.columns.str.lower()
+
+    # get column name like numdf
+    df_test = df_test[numdf.columns]
+
+    # scale df_test
+    df_test = scaler.transform(df_test)
+
+    # predict
+    res = clf.predict(df_test)
+
+    return res.tolist()
+
 
 # ==================== DATASET ==================== #
 
@@ -118,10 +262,10 @@ def get_rekomendasi(request):
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
     else:
-        if len(os.listdir('media/')) == 0:
+        if len(os.listdir('media/dset/')) == 0:
             return JsonResponse({'status': 'error', 'message': 'Dataset not found'}, status=404)
         else:
-            df = pd.read_csv('media/' + os.listdir('media/')[-1])     # load dataset
+            df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])     # load dataset
             
             # lowercase column name
             df.columns = df.columns.str.lower()
@@ -203,12 +347,12 @@ def get_rekomendasi(request):
 
 def upload_dataset(request):
     if request.method == 'POST':
-        if len(os.listdir('media/')) != 0:
-            os.remove('media/' + os.listdir('media/')[-1])
+        if len(os.listdir('media/dset/')) != 0:
+            os.remove('media/dset/' + os.listdir('media/dset/')[-1])
 
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['dataset'])
+            handle_upload_dataset(request.FILES['dataset'])
             return redirect('rekomendasi')
         else:
             return redirect('rekomendasi')
@@ -218,8 +362,17 @@ def upload_dataset(request):
 
 def delete_dataset(request):
     if request.method == 'POST':
-        if len(os.listdir('media/')) != 0:
-            os.remove('media/' + os.listdir('media/')[-1])
+        if len(os.listdir('media/dset/')) != 0:
+            os.remove('media/dset/' + os.listdir('media/dset/')[-1])
+
+        if len(os.listdir('media/mres/')) != 0:
+            for i in os.listdir('media/mres/'):
+                os.remove('media/mres/' + i)
+        
+        if len(os.listdir('media/dtest/')) != 0:
+            for i in os.listdir('media/dtest/'):
+                os.remove('media/dtest/' + i)
+
             return redirect('rekomendasi')
         else:
             return redirect('rekomendasi')
@@ -228,10 +381,10 @@ def delete_dataset(request):
 
 def bar_data(request):
     # if media folder is empty
-    if len(os.listdir('media/')) == 0:
+    if len(os.listdir('media/dset/')) == 0:
         return redirect('/')
     else:
-        df = pd.read_csv('media/' + os.listdir('media/')[-1])
+        df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
         last_col = df.iloc[:, -1].value_counts().to_dict()
         last_col = list(last_col.items())
         

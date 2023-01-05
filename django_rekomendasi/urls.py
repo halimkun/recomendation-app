@@ -27,6 +27,8 @@ urlpatterns = [
     path("dataset/delete/", views.delete_dataset, name="delete_dataset"),
     path("dataset/bar_data/", views.bar_data, name="bar_data"),
     path("dataset/get_rekomendasi/", views.get_rekomendasi, name="get_rekomendasi"),
+    path("dataset/mass-rekomendasi/", views.mass_recomendation, name="upload_dataset"),
 
-    path("rekomendasi/print/", views.print_rekomendasi, name="print_rekomendasi")
+    path("rekomendasi/print/", views.print_rekomendasi, name="print_rekomendasi"),
+    path("rekomendasi/mprint/", views.print_mrekomendasi, name="print_mrekomendasi")
 ]

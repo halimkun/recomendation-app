@@ -1,0 +1,128 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<style>
+    /* media print marin top  */
+    @media print {
+        @page {
+            margin: 0;
+            background-color: white;
+        }
+    }
+</style>
+<div class="flex flex-col w-full justify-center px-[1cm]">
+    <!-- <div class="w-[21cm] h-[29.7cm] bg-white p-5 px-[1.5cm] shadow parea" id="parea"> -->
+    <div class="text-center">
+        <h1 class="text-2xl font-bold underline">SURAT REKOMENDASI</h1>
+        <p class="text-base"><span class="mr-10">NOMOR :</span> / SKETR / <span id="month"></span> / <span
+                id="year"></span></p>
+    </div>
+    <div class="mt-5">
+        <p class="text-justify">Mewakili <span class="font-bold uppercase">SMK GONDANG</span>, Saya yang bertanda tangan dibawah ini :</p>
+        <table class="table-compact table-fixed text-left mt-2">
+            <tr>
+                <td class="text-base border-0 w-[30%] p-0">Nama</td>
+                <td class="border-0 p-0">:</td>
+                <td class="text-base border-0 w-full pl-3">Tarto Raharjo, S.T, M.T</td>
+            </tr>
+            <tr>
+                <td class="text-base border-0 w-[30%] p-0">NIPY</td>
+                <td class="border-0 p-0">:</td>
+                <td class="text-base border-0 w-full pl-3">65.274</td>
+            </tr>
+            <tr>
+                <td class="text-base border-0 w-[30%] p-0">Jabatan</td>
+                <td class="border-0 p-0">:</td>
+                <td class="text-base border-0 w-full pl-3">Kepala Sekolah</td>
+            </tr>
+            <tr>
+                <td class="text-base border-0 w-[30%] p-0">Alamat Sekolah</td>
+                <td class="border-0 p-0">:</td>
+                <td class="text-base border-0 w-full pl-3">Rowokembu, Kec. Wonopringgo, Kabupaten Pekalongan, Jawa
+                    Tengah 51181</td>
+            </tr>
+        </table>
+    </div>
+    <div class="mt-5">
+        <p class="text-justify">Dengan ini menerangkan bahwa : </p>
+        <table class="table-compact w-full table-fixed text-left border-collapse border border-gray-400 mt-2">
+            <tr>
+                {% for k in data.columns %}
+                    <th class="border capitalize border-gray-400">{{ k }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for index, row in data.iterrows %}
+                <tr>
+                    {% for cell in row %}
+                        <td class="border border-gray-400">{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+    <div class="mt-5">
+        <p class="text-justify">
+            Dengan ini merekomendasikan siswa tersebut sebagai kandidat karyawan baru pada <span
+                class="font-bold uppercase">{{ pred }}</span> dikarenakan telah memenuhi kriteria
+            sesuai dengan data sebelumnya, dan telah melalui proses seleksi menggunakan software sistem rekomendasi
+            perusahaan.
+        </p>
+        <p class="mt-3 text-justify">
+            Demikian surat rekomendasi ini dibuat untuk dapat dipergunakan sebagaimana mestinya.
+        </p>
+    </div>
+    <div class="flex w-full items-center justify-between mt-10">
+        <div class="w-full">
+
+        </div>
+        <div class="w-full text-center">
+            <p>Wonopringgo, <span id="tgl"></span> <span id="bln"></span> <span id="thn"></span></p>
+            <p>Kepala SMK GONDANG</p>
+            <p class="mt-20 font-bold uppercase underline">Tarto Raharjo, S.T, M.T</p>
+            <p class="font-bold uppercase">NIPY : 65.274</p>
+        </div>
+    </div>
+    <!-- </div> -->
+</div>
+
+<script>
+    // month with zero
+    const month = new Date().toLocaleString('default', { month: '2-digit' });
+    const year = new Date().getFullYear();
+    document.getElementById('month').innerHTML = month;
+    document.getElementById('year').innerHTML = year;
+
+    const tgl = new Date().getDate();
+    const bln = new Date().toLocaleString('default', { month: 'long' });
+    const thn = new Date().getFullYear();
+
+    document.getElementById('tgl').innerHTML = tgl;
+    document.getElementById('bln').innerHTML = bln;
+    document.getElementById('thn').innerHTML = thn;
+
+    // onload download pdf parea
+    window.onload = function () {
+
+        window.print();
+        // html2pdf(document.getElementById('parea'), {
+        //     margin: [5, 2, 2, 2],
+        //     filename: 'surat-rekomendasi-faisal.pdf',
+        //     image: {
+        //         type: 'jpeg',
+        //         quality: 0.98
+        //     },
+        //     html2canvas: {
+        //         scale: 3,
+        //         letterRendering: true,
+        //     },
+        //     jsPDF: {
+        //         unit: 'in',
+        //         format: 'a4',
+        //         orientation: 'portrait'
+        //     }
+        // });
+    }
+</script>
+{% endblock %}
