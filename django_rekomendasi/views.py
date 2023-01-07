@@ -126,7 +126,7 @@ def print_mrekomendasi(request):
         return redirect('/rekomendasi/')
     else:
         filter_label = request.POST.get('label')
-        
+
         df = load_data(os.listdir('media/mres/')[-1], 'media/mres/')
         
         if df is None:
@@ -166,7 +166,11 @@ def mass_recomendation(request):
         res = mass_rec()    # result label
 
         # merge res with dtest
-        dtest = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
+        # dtest = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
+        dtest = load_data(os.listdir('media/dtest/')[-1], 'media/dtest/')
+        
+        if dtest is None:
+            return redirect('/rekomendasi/')
 
         # get numeric column
         numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
@@ -200,7 +204,11 @@ def mass_recomendation(request):
         
 def mass_rec() :
     # load dataset
-    df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
+    # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
+    df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
+    
+    if df is None:
+        return redirect('/rekomendasi/')
     
     # lowercase column name
     df.columns = df.columns.str.lower()
@@ -248,8 +256,11 @@ def mass_rec() :
     accuracy = accuracy_score(y_test, y_pred)
 
     # load excel data
-    df_test = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
-    
+    # df_test = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
+    df_test = load_data(os.listdir('media/dtest/')[-1], 'media/dtest/')
+    if df_test is None:
+        return redirect('/rekomendasi/')
+
     # lowercase column name
     df_test.columns = df_test.columns.str.lower()
 
@@ -274,8 +285,12 @@ def get_rekomendasi(request):
         if len(os.listdir('media/dset/')) == 0:
             return JsonResponse({'status': 'error', 'message': 'Dataset not found'}, status=404)
         else:
-            df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])     # load dataset
+            # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])     # load dataset
+            df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
             
+            if df is None:
+                return redirect('/rekomendasi/')
+
             # lowercase column name
             df.columns = df.columns.str.lower()
             
@@ -393,7 +408,15 @@ def bar_data(request):
     if len(os.listdir('media/dset/')) == 0:
         return redirect('/')
     else:
-        df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
+        # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
+        df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
+        if df is None:
+            return JsonResponse({
+                'status': False,
+                'label': [],
+                'count': [],
+            })
+
         last_col = df.iloc[:, -1].value_counts().to_dict()
         last_col = list(last_col.items())
         

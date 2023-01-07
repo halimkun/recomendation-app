@@ -1,0 +1,1 @@
+web: gunicorn django_rekomendasi.wsgi –log-file -

@@ -215,7 +215,7 @@
                             {% for i in input_label %}
                             <div>
                                 <label class="label" for="{{ i.key }}">{{ i.value }}</label>
-                                <input type="number" value="0" min="0" max="100" step=".2" class="nilai input input-bordered focus:border-primary w-full" id="{{ i.key }}" name="{{ i.key }}" placeholder="Masukkan nilai {{ i.value}}">
+                                <input type="number" value="0" min="30" max="100" step=".2" class="nilai input input-bordered focus:border-primary w-full" id="{{ i.key }}" name="{{ i.key }}" placeholder="Masukkan nilai {{ i.value}}">
                             </div>
                             {% endfor %}
                         </div>
@@ -225,6 +225,8 @@
                 </div>
 
                 {% if dataset == True %}
+                <div class="divider">HASIL REKOMENDASI</div>
+
                 <div class="card card-body bg-base-100 shadow rouned-xl mt-5 hidden" id="chasil">
                     <div class="mb-5 flex justify-between gap-10 items-center">
                         <div>

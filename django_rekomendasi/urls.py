@@ -14,6 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 from . import views
 
@@ -31,4 +34,4 @@ urlpatterns = [
 
     path("rekomendasi/print/", views.print_rekomendasi, name="print_rekomendasi"),
     path("rekomendasi/mprint/", views.print_mrekomendasi, name="print_mrekomendasi")
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
