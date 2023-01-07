@@ -34,4 +34,4 @@ urlpatterns = [
 
     path("rekomendasi/print/", views.print_rekomendasi, name="print_rekomendasi"),
     path("rekomendasi/mprint/", views.print_mrekomendasi, name="print_mrekomendasi")
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
