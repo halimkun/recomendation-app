@@ -406,7 +406,11 @@ def delete_dataset(request):
 def bar_data(request):
     # if media folder is empty
     if len(os.listdir('media/dset/')) == 0:
-        return redirect('/')
+        return JsonResponse({
+            'status': False,
+            'label': [],
+            'count': [],
+        })
     else:
         # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
         df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
