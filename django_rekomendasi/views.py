@@ -48,23 +48,27 @@ def init_rekomendasi(req):
     if len(os.listdir('media/dset/')) == 0:
             context = context
     else:
-        df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
-
-        last_col = df.iloc[:, -1].value_counts().to_dict()
-        last_col = list(last_col.items())
-
-        # drop first and second column
-        nilai_df = df.drop(df.columns[[0, 1]], axis=1)
-        nilai_df = nilai_df.drop(nilai_df.columns[-1], axis=1)
-
-        col_name = []
-        for i in range(len(nilai_df.columns)):
-            col_name.append({'key': nilai_df.columns[i].replace(" ", "_").lower() , 'value': nilai_df.columns[i]})
+        # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
+        df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
         
-        context['dataset'] = True
-        context['filename'] = os.listdir('media/dset/')[-1]
-        context['input_label'] = col_name
-        context['data'] = df
+        if df is None: 
+            context = context
+        else :
+            last_col = df.iloc[:, -1].value_counts().to_dict()
+            last_col = list(last_col.items())
+
+            # drop first and second column
+            nilai_df = df.drop(df.columns[[0, 1]], axis=1)
+            nilai_df = nilai_df.drop(nilai_df.columns[-1], axis=1)
+
+            col_name = []
+            for i in range(len(nilai_df.columns)):
+                col_name.append({'key': nilai_df.columns[i].replace(" ", "_").lower() , 'value': nilai_df.columns[i]})
+            
+            context['dataset'] = True
+            context['filename'] = os.listdir('media/dset/')[-1]
+            context['input_label'] = col_name
+            context['data'] = df
 
     return context
 
@@ -109,10 +113,11 @@ def print_rekomendasi(request):
         data = []
         for i in key:
             data.append((key[i].lower()))
-        
+
         return render(request, 'print.html', {
             "key" : key,
             "data" : data,
+            "pred" : request.POST.get('prediction'),
         })
 
 
@@ -121,21 +126,25 @@ def print_mrekomendasi(request):
         return redirect('/rekomendasi/')
     else:
         filter_label = request.POST.get('label')
-        # mres file to dataframe
-        df = pd.read_csv('media/mres/' + os.listdir('media/mres/')[-1])
-
-        # filter by label
-        filtered_df = df[df['label'] == filter_label]
-        filtered_df.columns = filtered_df.columns.str.lower()
-
-        # get filtered_df except label and no
-        fix_df = filtered_df.drop(filtered_df.columns[0], axis=1)
-        fix_df = fix_df.drop(filtered_df.columns[-1], axis=1)
         
-        return render(request, 'mprint.html', {
-            "data" : fix_df,
-            "pred" : filter_label,
-        })
+        df = load_data(os.listdir('media/mres/')[-1], 'media/mres/')
+        
+        if df is None:
+            return redirect('/rekomendasi/')
+        
+        else:
+            # filter by label
+            filtered_df = df[df['label'] == filter_label]
+            filtered_df.columns = filtered_df.columns.str.lower()
+
+            # get filtered_df except label and no
+            fix_df = filtered_df.drop(filtered_df.columns[0], axis=1)
+            fix_df = fix_df.drop(filtered_df.columns[-1], axis=1)
+            
+            return render(request, 'mprint.html', {
+                "data" : fix_df,
+                "pred" : filter_label,
+            })
     
     
 def mass_recomendation(request):
@@ -174,7 +183,7 @@ def mass_recomendation(request):
         dtest = dtest.sort_values(by=['avg'], ascending=False)
 
         # save dtest to csv in media/mres
-        dtest.to_csv('media/mres/' + os.listdir('media/dtest/')[-1], index=False)
+        dtest.to_csv('media/mres/' + "result.csv", index=False)
 
         col = dtest.columns.tolist()
         lebel = dtest['label'].unique().tolist()
@@ -404,6 +413,27 @@ def bar_data(request):
             'count': count,
         }
 
-        
         # return json
         return JsonResponse(last_col, safe=False)
+
+
+# ==================== DATA LOADING ==================== #
+def load_data(f,l):
+    if f.endswith('.csv'):
+        df = pd.read_csv(os.path.join(l,f))
+        return df
+
+    elif f.endswith('.xls'):
+        df = pd.read_excel(os.path.join(l,f))
+        return df
+    
+    elif f.endswith('.xlsx'):
+        df = pd.read_excel(os.path.join(l,f))
+        return df
+    
+    else:
+        print('File not supported')
+        return None 
+        
+    
+    

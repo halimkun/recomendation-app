@@ -234,7 +234,7 @@
                             </p>
                         </div>
                         <div>
-                            <form action="/rekomendasi/print/" method="post">
+                            <form action="/rekomendasi/print/" target="_blank" method="post">
                                 {% csrf_token %}
                                 <div id="append_val"></div>
                                 <button class="btn btn-sm btn-circle btn-primary" id="btnprint"><i class="bi bi-printer"></i></button>
@@ -406,7 +406,7 @@
                                             let html = '';
                                             html += '<div class="divider">HASIL REKOMENDASI</div>';
                                             for (k in ids) {
-                                                html += '<div class="card card-body bg-base-100 shadow rouned-xl mt-5"><div class="flex items-center justify-between"><h5 class="text-xl font-bold">'+ids[k]+'</h5><form method="POST" action="/rekomendasi/mprint/">{% csrf_token %}<input type="hidden" name="label" value="'+ids[k]+'"><button class="btn btn-sm btn-circle btn-primary" id="btnprint"><i class="bi bi-printer"></i></button></form></div><div class="overflow-x-auto mt-3 max-h-64"><table class="table w-full tabelhasil" id="tblhasli_'+k+'">';
+                                                html += '<div class="card card-body bg-base-100 shadow rouned-xl mt-5"><div class="flex items-center justify-between"><h5 class="text-xl font-bold">'+ids[k]+'</h5><form method="POST" target="_blank" action="/rekomendasi/mprint/">{% csrf_token %}<input type="hidden" name="label" value="'+ids[k]+'"><button class="btn btn-sm btn-circle btn-primary" id="btnprint"><i class="bi bi-printer"></i></button></form></div><div class="overflow-x-auto mt-3 max-h-64"><table class="table w-full tabelhasil" id="tblhasli_'+k+'">';
                                                 
                                                 html += '<thead><tr>';
                                                 res.col.forEach(e => {
