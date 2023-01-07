@@ -150,6 +150,7 @@ def print_mrekomendasi(request):
 def mass_recomendation(request):
     if request.method != 'POST':
         return redirect('/rekomendasi/')
+    
     else:
         if len(os.listdir('media/dtest/')) != 0:
             for i in os.listdir('media/dtest/'):
