@@ -7,8 +7,8 @@
 <div class="flex justify-center flex-col lg:flex-row gap-5">
     <div class="w-full lg:w-[30%] max-w-full">
         <div class="card card-body bg-base-100 rounded-xl shadow">
-            <h1 class="text-2xl italic font-bold hidden md:block">Rekomendation App</h1>
-            <p class="text-sm text-gray-600 hidden md:block">
+            <h1 class="text-2xl italic font-bold">Rekomendation App</h1>
+            <p class="text-sm text-gray-500">
                 sebelum dapat menggunakan aplikasi ini, anda harus menyiapkan <span class="font-bold">dataset</span>
                 terlebih dahulu dan diupload menggunakan form dibawah ini.
             </p>
@@ -89,13 +89,13 @@
                 data-tabs-toggle="#myTabContent" role="tablist">
                 <button class="mx-1 tab grow btn-sm btn btn-outline btn-primary" id="dataset-tab"
                     data-tabs-target="#dataset" type="button" role="tab" aria-controls="dataset"
-                    aria-selected="false">Dataset</button>
+                    aria-selected="true">Dataset</button>
                 <button class="mx-1 tab grow btn-sm btn btn-outline btn-primary" id="rekomendasi-tab"
                     data-tabs-target="#rekomendasi" type="button" role="tab" aria-controls="rekomendasi"
                     aria-selected="false">Rekomendasi</button>
                 <button class="mx-1 tab grow btn-sm btn btn-outline btn-primary" id="mass-rekomendasi-tab"
                     data-tabs-target="#mass-rekomendasi" type="button" role="tab" aria-controls="mass-rekomendasi"
-                    aria-selected="true">Mass Rekomendasi</button>
+                    aria-selected="false">Mass Rekomendasi</button>
             </div>
         </div>
         <div id="myTabContent">
@@ -175,7 +175,7 @@
                             type: "GET",
                             dataType: "json",
                             success: function (data) {
-                                var options={series:[{name:"Jumlah Data",data:data.count}],chart:{type:"bar",height:350},plotOptions:{bar:{borderRadius:4,horizontal:!0}},dataLabels:{enabled:!1},yaxis:{show:!1},xaxis:{categories:data.label}},chart=new ApexCharts(document.querySelector("#vperusahaan"),options);chart.render();
+                                var options={colors: ["#570DF8"],series:[{name:"Jumlah Data",data:data.count}],chart:{type:"bar",height:350, color: "#008080"},plotOptions:{bar:{borderRadius:4,horizontal:!0}},dataLabels:{enabled:!1},yaxis:{show:!1},xaxis:{categories:data.label}},chart=new ApexCharts(document.querySelector("#vperusahaan"),options);chart.render();
                             }
                         });
                     });
