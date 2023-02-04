@@ -50,29 +50,43 @@ def init_rekomendasi(req):
     else:
         # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
         df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
-        
+        df.columns = df.columns.str.lower()
+        df.rename(columns={df.columns[0]: df.columns[0].replace('.', '')}, inplace=True)
+
         if df is None: 
             context = context
         else :
-            last_col = df.iloc[:, -1].value_counts().to_dict()
-            last_col = list(last_col.items())
+            if df.columns[0] != 'no' or df.columns[1] != 'nama':
+                context = {
+                    'title': 'RECAPP | Rekomendasi',
+                    'nav': nav_menu(req),
+                    'request': req,
+                    'dataset': True,
+                    'status_data': False,
+                    'filename': os.listdir('media/dset/')[-1],
+                    'data': df,
+                } 
+            else :
+                last_col = df.iloc[:, -1].value_counts().to_dict()
+                last_col = list(last_col.items())
 
-            # drop first and second column
-            nilai_df = df.drop(df.columns[[0, 1]], axis=1)
-            nilai_df = nilai_df.drop(nilai_df.columns[-1], axis=1)
+                # drop first and second column
+                nilai_df = df.drop(df.columns[[0, 1]], axis=1)
+                nilai_df = nilai_df.drop(nilai_df.columns[-1], axis=1)
 
-            col_name = []
-            for i in range(len(nilai_df.columns)):
-                col_name.append({'key': nilai_df.columns[i].replace(" ", "_").lower() , 'value': nilai_df.columns[i]})
-            
-            context['dataset'] = True
-            context['filename'] = os.listdir('media/dset/')[-1]
-            context['input_label'] = col_name
-            context['data'] = df
+                col_name = []
+                for i in range(len(nilai_df.columns)):
+                    col_name.append({'key': nilai_df.columns[i].replace(" ", "_").lower() , 'value': nilai_df.columns[i]})
+                
+                context['dataset'] = True
+                context['status_data'] = True
+                context['filename'] = os.listdir('media/dset/')[-1]
+                context['input_label'] = col_name
+                context['data'] = df
 
     return context
 
-def rekomendasi(request):  
+def rekomendasi(request):   
     context = init_rekomendasi(req=request)
     return render(request, 'rekomendasi.html', context)
 
