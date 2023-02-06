@@ -125,7 +125,8 @@
         </div>
     </div>
     <div class="w-full lg:w-[70%]">
-        <div class="border-b border-gray-200 dark:border-gray-700 card card-body bg-base-100 rounded-xl shadow py-2 px-1 mb-3">
+        <div
+            class="border-b border-gray-200 dark:border-gray-700 card card-body bg-base-100 rounded-xl shadow py-2 px-1 mb-3">
             <div class="flex flex-wrap -mb-px text-sm font-medium text-center tabs" id="myTab"
                 data-tabs-toggle="#myTabContent" role="tablist">
                 <button class="mx-1 tab grow btn-sm btn btn-outline btn-primary" id="dataset-tab"
@@ -164,7 +165,7 @@
                 </div>
                 {% else %}
                 <div class="card card-body rounded-xl bg-base-100 shadow">
-                    <div class="mb-5">
+                    <div class="mb-1">
                         <h3 class="text-2xl font-semibold leading-1">Dataset</h3>
                         <p class="text-sm text-gray-500">Data berikut merupakan data yang anda upload</p>
                     </div>
@@ -209,7 +210,7 @@
                         <h3 class="text-2xl font-semibold leading-1">Visualisasi Data</h3>
                         <p class="text-sm text-gray-500">Grafik berikut merupakan visualisasi jumlah data perusahaan</p>
                     </div>
-                    <div id="vperusahaan" class="w-full pr-5"></div>
+                    <canvas id="vperusahaan" class="w-full pr-5"></canvas>
                 </div>
                 <script>
                     $(document).ready(function () {
@@ -218,7 +219,53 @@
                             type: "GET",
                             dataType: "json",
                             success: function (data) {
-                                var options = { colors: ["#570DF8"], series: [{ name: "Jumlah Data", data: data.count }], chart: { type: "bar", height: 350, color: "#008080" }, plotOptions: { bar: { borderRadius: 4, horizontal: !0 } }, dataLabels: { enabled: !1 }, yaxis: { show: !1 }, xaxis: { categories: data.label } }, chart = new ApexCharts(document.querySelector("#vperusahaan"), options); chart.render();
+                                console.log(data);
+                                let delayed;
+                                // bar chart chart.js
+                                var ctx = document.getElementById("vperusahaan").getContext('2d');
+                                var myChart = new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: data.label,
+                                        datasets: [{
+                                            label: 'Jumlah Data',
+                                            data: data.count,
+                                            backgroundColor: [
+                                                '#7341ff',
+                                            ],
+                                            borderColor: [
+                                                '#570df8',
+                                            ],
+                                            borderWidth: 3,
+                                            borderRadius: 10,
+                                        }]
+                                    },
+                                    options: {
+                                        scales: {
+                                            y: {
+                                                stacked: true
+                                            },
+                                            x: {
+                                                ticks: {
+                                                    display: false
+                                                },
+                                                stacked: true,
+                                            },
+                                        },
+                                        animation: {
+                                            onComplete: () => {
+                                                delayed = true;
+                                            },
+                                            delay: (context) => {
+                                                let delay = 0;
+                                                if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                                                    delay = context.dataIndex * 300 + context.datasetIndex * 100;
+                                                }
+                                                return delay;
+                                            },
+                                        },
+                                    }
+                                });
                             }
                         });
                     });
@@ -282,11 +329,11 @@
                             <i class="bi bi-exclamation-circle"></i>
                             <span class="font-bold">Perhatian !</span>
                         </div>
-                        <div>
+                        <div class="flex flex-col gap-2 items-start">
                             <span>
-                                Data yang anda unggah tidak sesuai dengan kriteria yang telah ditentukan, silahkan ganti
-                                dataset dengan data yang sesuai.
+                                {{ message }}
                             </span>
+                            <a href="/bantuan" class="bg-base-100 hover:bg-base-200 rounded py-1 px-3">Panduan</a>
                         </div>
                     </div>
                 </div>
@@ -369,7 +416,6 @@
                 </div>
                 <script>
                     $(document).ready(function () {
-                        // submit form
                         $('#frekomendasi').submit(function (e) {
                             e.preventDefault();
 
@@ -546,11 +592,11 @@
                             <i class="bi bi-exclamation-circle"></i>
                             <span class="font-bold">Perhatian !</span>
                         </div>
-                        <div>
+                        <div class="flex flex-col gap-2 items-start">
                             <span>
-                                Data yang anda unggah tidak sesuai dengan kriteria yang telah ditentukan, silahkan ganti
-                                dataset dengan data yang sesuai.
+                                {{ message }}
                             </span>
+                            <a href="/bantuan" class="bg-base-100 hover:bg-base-200 rounded py-1 px-3">Panduan</a>
                         </div>
                     </div>
                 </div>
