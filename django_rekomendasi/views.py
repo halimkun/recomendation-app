@@ -46,16 +46,16 @@ def init_rekomendasi(req):
     }
 
     if len(os.listdir('media/dset/')) == 0:
-            context = context
+        context = context
     else:
         # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
         df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
         df.columns = df.columns.str.lower()
         df.rename(columns={df.columns[0]: df.columns[0].replace('.', '')}, inplace=True)
 
-        if df is None: 
+        if df is None:
             context = context
-        else :
+        else:
             if df.columns[0] != 'no' or df.columns[1] != 'nama':
                 context = {
                     'title': 'RECAPP | Rekomendasi',
@@ -65,8 +65,20 @@ def init_rekomendasi(req):
                     'status_data': False,
                     'filename': os.listdir('media/dset/')[-1],
                     'data': df,
-                } 
-            else :
+                    'message' :  "Data yang anda unggah tidak sesuai dengan kriteria yang telah ditentukan, silahkan ganti dengan data yang sesuai."
+                }
+            elif df.iloc[:, -1].dtype != 'object':
+                context = {
+                    'title': 'RECAPP | Rekomendasi',
+                    'nav': nav_menu(req),
+                    'request': req,
+                    'dataset': True,
+                    'status_data': False,
+                    'filename': os.listdir('media/dset/')[-1],
+                    'data': df,
+                    'message' : "Data yang anda unggah tidak memiliki label, silahkan tambahkan label pada data yang anda unggah."
+                }
+            else:
                 last_col = df.iloc[:, -1].value_counts().to_dict()
                 last_col = list(last_col.items())
 
@@ -76,20 +88,22 @@ def init_rekomendasi(req):
 
                 col_name = []
                 for i in range(len(nilai_df.columns)):
-                    col_name.append({'key': nilai_df.columns[i].replace(" ", "_").lower() , 'value': nilai_df.columns[i]})
-                
+                    col_name.append({'key': nilai_df.columns[i].replace(
+                        " ", "_").lower(), 'value': nilai_df.columns[i]})
+
                 context['dataset'] = True
                 context['status_data'] = True
                 context['filename'] = os.listdir('media/dset/')[-1]
                 context['input_label'] = col_name
                 context['data'] = df
+                context['message'] = ""
 
     return context
 
-def rekomendasi(request):   
+
+def rekomendasi(request):
     context = init_rekomendasi(req=request)
     return render(request, 'rekomendasi.html', context)
-
 
 
 def bantuan(request):
@@ -129,9 +143,9 @@ def print_rekomendasi(request):
             data.append((key[i].lower()))
 
         return render(request, 'print.html', {
-            "key" : key,
-            "data" : data,
-            "pred" : request.POST.get('prediction'),
+            "key": key,
+            "data": data,
+            "pred": request.POST.get('prediction'),
         })
 
 
@@ -142,10 +156,10 @@ def print_mrekomendasi(request):
         filter_label = request.POST.get('label')
 
         df = load_data(os.listdir('media/mres/')[-1], 'media/mres/')
-        
+
         if df is None:
             return redirect('/rekomendasi/')
-        
+
         else:
             # filter by label
             filtered_df = df[df['label'] == filter_label]
@@ -154,26 +168,26 @@ def print_mrekomendasi(request):
             # get filtered_df except label and no
             fix_df = filtered_df.drop(filtered_df.columns[0], axis=1)
             fix_df = fix_df.drop(filtered_df.columns[-1], axis=1)
-            
+
             return render(request, 'mprint.html', {
-                "data" : fix_df,
-                "pred" : filter_label,
+                "data": fix_df,
+                "pred": filter_label,
             })
-    
-    
+
+
 def mass_recomendation(request):
     if request.method != 'POST':
         return redirect('/rekomendasi/')
-    
+
     else:
         if len(os.listdir('media/dtest/')) != 0:
             for i in os.listdir('media/dtest/'):
                 os.remove('media/dtest/' + i)
-                
+
         if len(os.listdir('media/mres/')) != 0:
             for i in os.listdir('media/mres/'):
                 os.remove('media/mres/' + i)
-            
+
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             handle_upload_dtest(request.FILES['dataset'])
@@ -183,7 +197,7 @@ def mass_recomendation(request):
         # merge res with dtest
         # dtest = pd.read_excel('media/dtest/' + os.listdir('media/dtest/')[-1])
         dtest = load_data(os.listdir('media/dtest/')[-1], 'media/dtest/')
-        
+
         if dtest is None:
             return redirect('/rekomendasi/')
 
@@ -191,13 +205,13 @@ def mass_recomendation(request):
         numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
         numdf = dtest.select_dtypes(include=numerics)
         numdf = numdf.drop(numdf.columns[0], axis=1)
-        
+
         # add average to dtest
         dtest['avg'] = numdf.mean(axis=1)
 
         # add label to dtest
         dtest['label'] = res
-        
+
         # short dtest by average high to low
         dtest = dtest.sort_values(by=['avg'], ascending=False)
 
@@ -209,22 +223,21 @@ def mass_recomendation(request):
         data = {}
         for i in lebel:
             data[i] = dtest[dtest['label'] == i].to_dict('records')
-            
+
         return JsonResponse({
             'col': col,
             'data': data,
         }, safe=False)
-            
 
-        
-def mass_rec() :
+
+def mass_rec():
     # load dataset
     # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])
     df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
-    
+
     if df is None:
         return redirect('/rekomendasi/')
-    
+
     # lowercase column name
     df.columns = df.columns.str.lower()
 
@@ -242,8 +255,9 @@ def mass_rec() :
 
     # get numeric column
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-    numdf = df.select_dtypes(include=numerics)     
-    numdf = numdf.drop(columns=['no'])     # drop No column cause it's not important but it's numeric
+    numdf = df.select_dtypes(include=numerics)
+    # drop No column cause it's not important but it's numeric
+    numdf = numdf.drop(columns=['no'])
 
     # get label column
     label = df.iloc[:, -1]
@@ -253,8 +267,9 @@ def mass_rec() :
     scaled = scaler.fit_transform(numdf)
 
     # split data
-    X_train, X_test, y_train, y_test = train_test_split(scaled, label, test_size=0.3, random_state=42)
-    
+    X_train, X_test, y_train, y_test = train_test_split(
+        scaled, label, test_size=0.3, random_state=42)
+
     # model init
     clf = tree.DecisionTreeClassifier(
         max_depth=3,
@@ -302,26 +317,29 @@ def get_rekomendasi(request):
         else:
             # df = pd.read_csv('media/dset/' + os.listdir('media/dset/')[-1])     # load dataset
             df = load_data(os.listdir('media/dset/')[-1], 'media/dset/')
-            
+
             if df is None:
                 return redirect('/rekomendasi/')
 
             # lowercase column name
             df.columns = df.columns.str.lower()
-            
+
             # get numeric column
             df = df.dropna()
-            
+
             # remove outlier
             Q1 = df.quantile(0.25)
             Q3 = df.quantile(0.75)
             IQR = Q3 - Q1
-            df = df[~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).any(axis=1)]
+            df = df[~((df < (Q1 - 1.5 * IQR)) |
+                      (df > (Q3 + 1.5 * IQR))).any(axis=1)]
 
             # select numeric column
-            numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-            numdf = df.select_dtypes(include=numerics)     
-            numdf = numdf.drop(columns=['no'])     # drop No column cause it's not important but it's numeric
+            numerics = ['int16', 'int32', 'int64',
+                        'float16', 'float32', 'float64']
+            numdf = df.select_dtypes(include=numerics)
+            # drop No column cause it's not important but it's numeric
+            numdf = numdf.drop(columns=['no'])
 
             # get label column
             label = df.iloc[:, -1]
@@ -331,8 +349,9 @@ def get_rekomendasi(request):
             nilai_df = scaler.fit_transform(numdf)
 
             # split dataset
-            x_train, x_test, y_train, y_test = train_test_split(nilai_df, label, test_size=0.3, random_state=42)
-            
+            x_train, x_test, y_train, y_test = train_test_split(
+                nilai_df, label, test_size=0.3, random_state=42)
+
             # model initialization
             clf = tree.DecisionTreeClassifier(
                 max_depth=3,
@@ -347,15 +366,15 @@ def get_rekomendasi(request):
             # get accuracy
             y_pred = clf.predict(x_test)
             accuracy = accuracy_score(y_test, y_pred)
-    
+
             # get prediction
             input_data = []
             # get nilai from post request
             for i in range(len(numdf.columns)):
                 input_data.append(
-                    request.POST.get(numdf.columns[i].replace(" ", "_").lower())
+                    request.POST.get(
+                        numdf.columns[i].replace(" ", "_").lower())
                 )
-
 
             # convert to numpy array
             input_data = np.array(input_data).reshape(1, -1)
@@ -365,12 +384,12 @@ def get_rekomendasi(request):
 
             # get prediction
             prediction = clf.predict(input_data)
-            
+
             # get classificaton report
             report = classification_report(y_test, y_pred)
             # report = pd.DataFrame(report).transpose().to_html()
             # report = report.replace('border="1" class="dataframe"', 'class="table table-bordered table-striped"')
-            
+
             return JsonResponse({
                 'status': True,
                 'message': 'Data found',
@@ -383,6 +402,7 @@ def get_rekomendasi(request):
                     'report': report,
                 },
             })
+
 
 def upload_dataset(request):
     if request.method == 'POST':
@@ -407,7 +427,7 @@ def delete_dataset(request):
         if len(os.listdir('media/mres/')) != 0:
             for i in os.listdir('media/mres/'):
                 os.remove('media/mres/' + i)
-        
+
         if len(os.listdir('media/dtest/')) != 0:
             for i in os.listdir('media/dtest/'):
                 os.remove('media/dtest/' + i)
@@ -417,6 +437,7 @@ def delete_dataset(request):
             return redirect('rekomendasi')
     else:
         return redirect('rekomendasi')
+
 
 def bar_data(request):
     # if media folder is empty
@@ -438,17 +459,17 @@ def bar_data(request):
 
         last_col = df.iloc[:, -1].value_counts().to_dict()
         last_col = list(last_col.items())
-        
-        # label to array 
+
+        # label to array
         label = []
         for i in range(len(last_col)):
             label.append(last_col[i][0])
-        
+
         # data to array
         count = []
         for i in range(len(last_col)):
             count.append(last_col[i][1])
-        
+
         # json
         last_col = {
             'label': label,
@@ -460,22 +481,19 @@ def bar_data(request):
 
 
 # ==================== DATA LOADING ==================== #
-def load_data(f,l):
+def load_data(f, l):
     if f.endswith('.csv'):
-        df = pd.read_csv(os.path.join(l,f))
+        df = pd.read_csv(os.path.join(l, f))
         return df
 
     elif f.endswith('.xls'):
-        df = pd.read_excel(os.path.join(l,f))
+        df = pd.read_excel(os.path.join(l, f))
         return df
-    
+
     elif f.endswith('.xlsx'):
-        df = pd.read_excel(os.path.join(l,f))
+        df = pd.read_excel(os.path.join(l, f))
         return df
-    
+
     else:
         print('File not supported')
-        return None 
-        
-    
-    
+        return None
