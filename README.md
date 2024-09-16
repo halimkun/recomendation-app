@@ -1,15 +1,37 @@
-# Django Recomendation App
-Sisrem rekomendasi perusahaan menggunakan django, aplikasi ini dibuat sebagai project akhir dan penelitian skripsi. pembuatan aplikasi ini menggunakan bahasa pemrograman python dan framework django. aplikasi ini menggunakan algoritma decision tree untuk merekomendasikan perusahaan yang sesuai dengan kriteria yang diinginkan oleh pengguna. 
+# 🏢 Company Recommendation System using Decision Tree 🌳
 
-data yang digunakan merupakan data siswa yang telah lulus dan sudah bekerja, data yang dipakai diambil dari data alumni **SMK Gondang**.
+**Company Recommendation System** adalah aplikasi berbasis web yang dibangun menggunakan bahasa pemrograman **Python** dan framework **Django**. Aplikasi ini dirancang untuk memberikan rekomendasi perusahaan kepada pengguna berdasarkan kriteria yang diinginkan, dengan menggunakan algoritma **Decision Tree**. 🎯
 
-## Demo
+Aplikasi ini dibuat sebagai bagian dari **project akhir** dan **penelitian skripsi**.
+
+## 📊 Algoritma
+Aplikasi ini memanfaatkan algoritma **Decision Tree** untuk mengklasifikasikan dan merekomendasikan perusahaan sesuai dengan preferensi yang dimasukkan pengguna.
+
+## 🏫 Sumber Data
+- Data yang digunakan berasal dari **alumni SMK Gondang** yang telah lulus dan bekerja di berbagai perusahaan.
+- Data ini digunakan sebagai basis untuk melatih model rekomendasi sehingga dapat memberikan saran yang relevan.
+
+## 🛠️ Teknologi yang Digunakan
+- **Bahasa Pemrograman**: Python 🐍
+- **Framework Web**: Django 🌐
+- **Algoritma**: Decision Tree 🌳
+
+## 🎥 Demo
+Berikut adalah demo aplikasi.
+
 |||
 |:---:|:---:|
 | ![Demo 1](./demo/demo.png) | ![Demo 2](./demo/demo-1.png) |
 | ![Demo 3](./demo/demo-2.png) | ![Demo 4](./demo/demo-3.png) |
 
-### Penggunaan
+## ⚙️ Penggunaan
 - download project 
 - install requirement `pip install -r requirements.txt`
 - jalankan program `python manage.py runserver`
+
+## 📄 License
+Proyek ini dilisensikan di bawah MIT License. Untuk detail lebih lanjut, lihat [LICENSE](LICENSE).
+
+---
+
+Built with ❤️ by halim.
